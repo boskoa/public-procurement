@@ -1,0 +1,7 @@
+PUT http://localhost:3003/api/users/2
+Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNlY28iLCJpZCI6MSwiaWF0IjoxNjU2MDIzNDE3fQ.rbw19GcF9LDYVExQyXo1Mdm20ObBW2lUesufobG2DU4
+
+{
+  "avatar": "public/data/uploads/user_avatar"
+}

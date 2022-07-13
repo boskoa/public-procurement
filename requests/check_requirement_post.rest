@@ -1,0 +1,7 @@
+POST http://localhost:3003/api/requirements
+Content-Type: application/json
+
+{
+    "name": "Aktuelni izvod",
+    "procedureId": 23
+}

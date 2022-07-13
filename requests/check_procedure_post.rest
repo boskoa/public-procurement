@@ -1,0 +1,23 @@
+POST http://localhost:3003/api/procedures
+Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNlY28iLCJpZCI6MSwiaWF0IjoxNjU0OTQ2MjQyfQ.xt-DYExeSA1Db_K7v996AU8Jb3IRZ5q8U5yjIvHWuKk
+
+{
+  "jib": "440266337007874",
+  "category": "konkurentski zahtjev",
+  "number": "987-7-1-88/22",
+  "name": "Nabavka tonera",
+  "frameworkAgreement": false,
+  "criterion": "najniža cijena",
+  "auction": true,
+  "submissionDate": "2022-07-18 14:00:00",
+  "budget": 20000.00,
+  "deliveryLocation": "Banja Luka",
+  "deliveryDate": 30,
+  "payment": 30,
+  "offerValidity": 90,
+  "filledDraft": false,
+  "copy": 0,
+  "amount": 19000.00,
+  "phase": "Čeka se odluka"
+}

@@ -1,0 +1,9 @@
+POST http://localhost:3003/api/authorities
+Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNlY28iLCJpZCI6MSwiaWF0IjoxNjU0OTMzOTkwfQ.js4vpQ3tm8r66ZuPHyMQlXAL8haRsU7f9qaWaPjNiIc
+
+{
+  "name": "Vodovod",
+  "jib": "4402696537089364",
+  "ajnCode": 65
+}

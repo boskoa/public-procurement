@@ -1,0 +1,8 @@
+POST http://localhost:3003/api/notifications
+Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InZhaGEiLCJpZCI6NCwiaWF0IjoxNjU2NjIxMDU5fQ.upbdDdKVeT5xqOFPcXODSJwJE756zAjy0H_eYgbASx4
+
+{
+    "text": "podsetnik 7",
+    "procedureId": 11
+}

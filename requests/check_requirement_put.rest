@@ -1,0 +1,7 @@
+PUT http://localhost:3003/api/requirements/1
+Content-Type: application/json
+
+{
+    "canDo": true,
+    "done": false
+}
