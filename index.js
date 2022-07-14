@@ -15,14 +15,7 @@ const cors = require('cors')
 const app = express()
 
 app.use(express.json())
-app.use(cors({
-  origin: 'http://localhost:3000',
-  optionsSuccessStatus: 200,
-  credentials :  true,
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  preflightContinue: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
-}))
+app.use(cors())
 
 app.use('/public', express.static(path.join(__dirname, 'public')))
 app.use(express.static('build'))
@@ -34,6 +27,9 @@ app.use('/api/authorities', contractingAuthoritiesRouter)
 app.use('/api/requirements', requirementsRouter)
 app.use('/api/notifications', notificationsRouter)
 app.use('/api/avatar', avatarsRouter)
+app.all('/*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'))
+})
 
 app.use(errorHandler)
 
