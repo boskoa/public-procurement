@@ -66,6 +66,9 @@ router.get('/', async (req, res, next) => {
 router.get('/:id', async (req, res, next) => {
   try {
     const user = await User.findByPk(req.params.id, {
+      attributes: {
+        exclude: ['passwordHash']
+      },
       include: [
         {
           model: Procedure,
@@ -96,14 +99,31 @@ router.post('/', async (req, res, next) => {
 })
 
 router.put('/:id', tokenExtractor, async (req, res, next) => {
-  const user = await User.findByPk(req.decodedToken.id)
+  const user = await User.findByPk(req.decodedToken.id, {
+    attributes: {
+      exclude: ['passwordHash']
+    }
+  })
 
-  if (!user.admin) {
+  if (!user.admin && req.decodedToken.id !== user.id) {
     res.status(401).json({ error: 'You are not authorized for this action.' })
   }
+
+  let newValues = { ...req.body }
+
+  if (newValues.password) {
+    const passwordHash = await bcrypt.hash(req.body.password, 10)
+    delete newValues.password
+    newValues.passwordHash = passwordHash
+  }
+
   try {
-    const userToChange = await User.findByPk(req.params.id)
-    userToChange.set({ ...req.body })
+    const userToChange = await User.findByPk(req.params.id, {
+      attributes: {
+        exclude: ['passwordHash']
+      }
+    })
+    userToChange.set({ ...newValues })
     await userToChange.save()
     res.json(userToChange)
   } catch (error) {

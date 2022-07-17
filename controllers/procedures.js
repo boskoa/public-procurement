@@ -71,7 +71,9 @@ router.get('/:id', async (req, res, next) => {
   try {
     const procedure = await Procedure.findByPk(req.params.id, {
       include: [
-        { model: User },
+        { model: User , attributes: {
+          exclude: ['passwordHash'] }
+        },
         { model: ContractingAuthority },
         { model: Requirement, attributes: ['name', 'canDo', 'done'] },
         { model: Notification }
@@ -118,7 +120,9 @@ router.put('/:id', tokenExtractor, async (req, res, next) => {
     const user = await User.findByPk(req.decodedToken.id)
     const procedureToChange = await Procedure.findByPk(req.params.id, {
       include: [
-        { model: User },
+        { model: User, attributes: {
+          exclude: ['passwordHash'] }
+        },
         { model: ContractingAuthority },
         { model: Requirement, attributes: ['name', 'canDo', 'done'] },
         { model: Notification }

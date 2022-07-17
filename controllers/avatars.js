@@ -36,7 +36,6 @@ router.post('/', tokenExtractor, upload.single('file'), async (req, res, next) =
     if (req.file.mimetype !== 'image/jpeg' && req.file.mimetype !== 'image/png') {
       return res.status(401).json({ error: 'Not a proper image type. Use jpg or png.' })
     }
-    console.log('AVATAR', req.file, req.body)
     return res.status(200).send({ path: req.file.path })
   } catch (error) {
     res.status(401).json({ error })
