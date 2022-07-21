@@ -3,7 +3,13 @@ const { ContractingAuthority, User, Procedure } = require('../models')
 const { Op } = require('sequelize')
 const tokenExtractor = require('../utils/tokenExtractor')
 
-router.get('/', async (req, res, next) => {
+router.get('/', tokenExtractor, async (req, res, next) => {
+  const user = await User.findByPk(req.decodedToken.id)
+
+  if (user?.disabled) {
+    return res.status(401).json({ error: 'Account disabled' })
+  }
+
   let where = {}
   let order = []
 
@@ -32,8 +38,14 @@ router.get('/', async (req, res, next) => {
   }
 })
 
-router.get('/:id', async (req, res, next) => {
+router.get('/:id', tokenExtractor, async (req, res, next) => {
   try {
+    const user = await User.findByPk(req.decodedToken.id)
+
+    if (user.disabled) {
+      return res.status(401).json({ error: 'Account disabled' })
+    }
+
     const authority = await ContractingAuthority.findByPk(req.params.id, {
       include: {
         model: Procedure
@@ -49,9 +61,14 @@ router.get('/:id', async (req, res, next) => {
   }
 })
 
-router.post('/', async (req, res, next) => {
+router.post('/', tokenExtractor, async (req, res, next) => {
   try {
-    console.log('REKBODI', req.body)
+    const user = await User.findByPk(req.decodedToken.id)
+
+    if (user.disabled) {
+      return res.status(401).json({ error: 'Account disabled' })
+    }
+
     const authority = await ContractingAuthority.create({ ...req.body })
     res.json(authority)
   } catch (error) {
@@ -65,6 +82,7 @@ router.put('/:id', tokenExtractor, async (req, res, next) => {
   if (!user.admin) {
     res.status(401).json({ error: 'You are not authorized for this action.' })
   }
+
   try {
     const authorityToChange = await ContractingAuthority.findByPk(req.params.id)
     authorityToChange.set({ ...req.body })

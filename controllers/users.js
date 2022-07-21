@@ -4,8 +4,14 @@ const bcrypt = require('bcrypt')
 const { Op } = require('sequelize')
 const tokenExtractor = require('../utils/tokenExtractor')
 
-router.get('/overview', async (req, res, next) => {
+router.get('/overview', tokenExtractor, async (req, res, next) => {
   try {
+    const user = await User.findByPk(req.decodedToken.id)
+
+    if (user.disabled) {
+      return res.status(401).json({ error: 'Account disabled' })
+    }
+
     const users = await User.findAll({
       attributes: {
         exclude: ['passwordHash']
@@ -20,7 +26,13 @@ router.get('/overview', async (req, res, next) => {
   }
 })
 
-router.get('/', async (req, res, next) => {
+router.get('/', tokenExtractor, async (req, res, next) => {
+  const user = await User.findByPk(req.decodedToken.id)
+
+  if (user?.disabled) {
+    return res.status(401).json({ error: 'Account disabled' })
+  }
+
   let where = {}
   let order = []
 
@@ -63,8 +75,14 @@ router.get('/', async (req, res, next) => {
   }
 })
 
-router.get('/:id', async (req, res, next) => {
+router.get('/:id', tokenExtractor, async (req, res, next) => {
   try {
+    const userToken = await User.findByPk(req.decodedToken.id)
+
+    if (userToken.disabled) {
+      return res.status(401).json({ error: 'Account disabled' })
+    }
+
     const user = await User.findByPk(req.params.id, {
       attributes: {
         exclude: ['passwordHash']
@@ -105,6 +123,10 @@ router.put('/:id', tokenExtractor, async (req, res, next) => {
     }
   })
 
+  if (user?.disabled) {
+    return res.status(401).json({ error: 'Account disabled' })
+  }
+
   if (!user.admin && req.decodedToken.id !== user.id) {
     res.status(401).json({ error: 'You are not authorized for this action.' })
   }
@@ -133,6 +155,10 @@ router.put('/:id', tokenExtractor, async (req, res, next) => {
 
 router.delete('/:id', tokenExtractor, async (req, res, next) => {
   const user = await User.findByPk(req.decodedToken.id)
+
+  if (user?.disabled) {
+    return res.status(401).json({ error: 'Account disabled' })
+  }
 
   if (!user.admin) {
     res.status(401).json({ error: 'You are not authorized for this action.' })

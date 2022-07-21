@@ -30,6 +30,11 @@ const upload = multer({
 router.post('/', tokenExtractor, upload.single('file'), async (req, res, next) => {
   try {
     const user = await User.findByPk(req.decodedToken.id)
+
+    if (user.disabled) {
+      return res.status(401).json({ error: 'Account disabled' })
+    }
+
     user.set({ avatar: req.file.path })
     await user.save()
 
@@ -39,6 +44,23 @@ router.post('/', tokenExtractor, upload.single('file'), async (req, res, next) =
     return res.status(200).send({ path: req.file.path })
   } catch (error) {
     res.status(401).json({ error })
+    next(error)
+  }
+})
+
+router.get('/remove/:id', tokenExtractor, async (req, res, next) => {
+  try {
+    const userAdmin = await User.findByPk(req.decodedToken.id)
+    const user = await User.findByPk(req.params.id)
+
+    if (!userAdmin.admin) {
+      res.status(401).json({ error: 'You are not authorized for this action.' })
+    }
+
+    user.set({ avatar: 'public/data/uploads/user_avatar' })
+    await user.save()
+    res.send({ path: user.avatar })
+  } catch (error) {
     next(error)
   }
 })

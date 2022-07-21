@@ -1,7 +1,14 @@
 const router = require('express').Router()
-const { Requirement, Procedure } = require('../models')
+const { Requirement, Procedure, User } = require('../models')
+const tokenExtractor = require('../utils/tokenExtractor')
 
-router.get('/', async (req, res, next) => {
+router.get('/', tokenExtractor, async (req, res, next) => {
+  const user = await User.findByPk(req.decodedToken.id)
+
+  if (user?.disabled) {
+    return res.status(401).json({ error: 'Account disabled' })
+  }
+
   let where = {}
   let order = []
 
@@ -28,8 +35,14 @@ router.get('/', async (req, res, next) => {
   }
 })
 
-router.get('/:id', async (req, res, next) => {
+router.get('/:id', tokenExtractor, async (req, res, next) => {
   try {
+    const user = await User.findByPk(req.decodedToken.id)
+
+    if (user.disabled) {
+      return res.status(401).json({ error: 'Account disabled' })
+    }
+
     const requirement = await Requirement.findByPk(req.params.id, {
       include: {
         model: Procedure, attributes: ['name']
@@ -45,8 +58,14 @@ router.get('/:id', async (req, res, next) => {
   }
 })
 
-router.post('/', async (req, res, next) => {
+router.post('/', tokenExtractor, async (req, res, next) => {
   try {
+    const user = await User.findByPk(req.decodedToken.id)
+
+    if (user.disabled) {
+      return res.status(401).json({ error: 'Account disabled' })
+    }
+
     const requirement = await Requirement.create({ ...req.body })
     res.json(requirement)
   } catch (error) {
@@ -54,8 +73,14 @@ router.post('/', async (req, res, next) => {
   }
 })
 
-router.put('/:id', async (req, res, next) => {
+router.put('/:id', tokenExtractor, async (req, res, next) => {
   try {
+    const user = await User.findByPk(req.decodedToken.id)
+
+    if (user.disabled) {
+      return res.status(401).json({ error: 'Account disabled' })
+    }
+
     const requirementToChange = await Requirement.findByPk(req.params.id)
     requirementToChange.set({ ...req.body })
     await requirementToChange.save()
@@ -65,8 +90,14 @@ router.put('/:id', async (req, res, next) => {
   }
 })
 
-router.delete('/:id', async (req, res, next) => {
+router.delete('/:id', tokenExtractor, async (req, res, next) => {
   try {
+    const user = await User.findByPk(req.decodedToken.id)
+
+    if (user.disabled) {
+      return res.status(401).json({ error: 'Account disabled' })
+    }
+
     await Requirement.destroy({ where: { id: req.params.id } })
     res.status(200).end()
   } catch (error) {

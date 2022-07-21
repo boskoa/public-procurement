@@ -4,6 +4,12 @@ const { Op } = require('sequelize')
 const tokenExtractor = require('../utils/tokenExtractor')
 
 router.get('/', tokenExtractor, async (req, res, next) => {
+  const user = await User.findByPk(req.decodedToken.id)
+
+  if (user?.disabled) {
+    return res.status(401).json({ error: 'Account disabled' })
+  }
+
   let where = { userId: req.decodedToken.id }
   let order = []
 
@@ -37,8 +43,14 @@ router.get('/', tokenExtractor, async (req, res, next) => {
   }
 })
 
-router.get('/:id', async (req, res, next) => {
+router.get('/:id', tokenExtractor, async (req, res, next) => {
   try {
+    const user = await User.findByPk(req.decodedToken.id)
+
+    if (user.disabled) {
+      return res.status(401).json({ error: 'Account disabled' })
+    }
+
     const notification = await Notification.findByPk(req.params.id, {
       include: [
         { model: Procedure, attributes: ['name', 'id'] },
@@ -57,6 +69,12 @@ router.get('/:id', async (req, res, next) => {
 
 router.post('/', tokenExtractor, async (req, res, next) => {
   try {
+    const user = await User.findByPk(req.decodedToken.id)
+
+    if (user.disabled) {
+      return res.status(401).json({ error: 'Account disabled' })
+    }
+
     const notification = await Notification.create({
       ...req.body, userId: req.decodedToken.id
     })
@@ -69,6 +87,11 @@ router.post('/', tokenExtractor, async (req, res, next) => {
 router.put('/:id', tokenExtractor, async (req, res, next) => {
   try {
     const user = await User.findByPk(req.decodedToken.id)
+
+    if (user.disabled) {
+      return res.status(401).json({ error: 'Account disabled' })
+    }
+
     const notificationToChange = await Notification.findByPk(req.params.id,{
       include: [
         {
@@ -96,6 +119,11 @@ router.put('/:id', tokenExtractor, async (req, res, next) => {
 router.delete('/:id', tokenExtractor, async (req, res, next) => {
   try {
     const user = await User.findByPk(req.decodedToken.id)
+
+    if (user.disabled) {
+      return res.status(401).json({ error: 'Account disabled' })
+    }
+
     const notificationToDelete = await Notification.findByPk(req.params.id)
 
     if (!user.admin && req.decodedToken.id !== notificationToDelete.userId) {
