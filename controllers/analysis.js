@@ -12,8 +12,8 @@ router.get('/procs-by-month', tokenExtractor, async (req, res, next) => {
       return res.status(401).json({ error: 'Account disabled' })
     }
 
-    const start = req.query.start
-    const end = req.query.end
+    const start = new Date(Date.parse(decodeURIComponent(req.query.start)))
+    const end = new Date(Date.parse(decodeURIComponent(req.query.end)))
 
     const procedures = await Procedure.findAll({
       where: { [Op.or]: [
@@ -36,8 +36,10 @@ router.get('/procs-by-users', tokenExtractor, async (req, res, next) => {
       return res.status(401).json({ error: 'Account disabled' })
     }
 
-    const start = new Date(req.query.start).toISOString().slice(0, 19).replace('T', ' ').replace('Z', '')
-    const end = new Date(req.query.end).toISOString().slice(0, 19).replace('T', ' ').replace('Z', '')
+    const start = new Date(req.query.start)
+      .toISOString().slice(0, 19).replace('T', ' ').replace('Z', '')
+    const end = new Date(req.query.end)
+      .toISOString().slice(0, 19).replace('T', ' ').replace('Z', '')
 
     const result = await sequelize.query(
       `SELECT
@@ -69,6 +71,3 @@ router.get('/procs-by-users', tokenExtractor, async (req, res, next) => {
 })
 
 module.exports = router
-
-//WHERE procedures.created_at >= ${start} AND procedures.created_at <= ${end}
-//WHERE procedures.created_at BETWEEN ${start} AND ${end}
